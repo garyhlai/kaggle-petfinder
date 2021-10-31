@@ -10,10 +10,13 @@ class PawpularModel(nn.Module):
         self.dropout = nn.Dropout(0.1)
         self.head = nn.Linear(image_encoding_dim+feature_dim, 1)
     
-    def forward(self, image, features, targets=None):
+    def forward(self, x):
+        # image should be shape (batch_size, channel, img_size, img_size)
+        image, features = x['image'], x['dense_features']
+
         x = self.model(image)
         x = self.dropout(x)
         # (batch_size, 128, 1) -> (batch_size, 128+12, 1)
-        x = torch.concat([x, features], dim=1)
+        x = torch.cat([x, features], dim=1)
         x = self.head(x)
         return x

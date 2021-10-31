@@ -7,7 +7,6 @@ import dill
 class Learner:
     def __init__(self, model, dls, loss_func, optimizer, lr, valid_interval=2, cbs=[], get_pred=None):
         store_attr('model, dls, loss_func, optimizer, lr, valid_interval, cbs, get_pred', self)
-        if get_pred == None: self.get_pred = self.model
         for cb in cbs: cb.learner = self
         self.cb_dict = { type(cb).__name__: cb for cb in self.cbs}
 
@@ -33,7 +32,9 @@ class Learner:
     def train_batch(self):
         self('before_train_batch')
         # forward
-        self.pred = self.get_pred(self.batch_x, self.model)
+        if self.get_pred == None: 
+            self.pred = self.model(self.batch_x)
+        self('before_train_loss')
         self.loss = self.loss_func(self.pred, self.batch_y)
         self('after_train_loss')
         # backward
@@ -55,7 +56,8 @@ class Learner:
         self('before_valid_batch')
         # forward
         with torch.no_grad(): 
-            self.pred = self.get_pred(self.batch_x, self.model)
+            if self.get_pred == None: 
+                self.pred = self.model(self.batch_x)
             self.loss = self.loss_func(self.pred, self.batch_y)
         self('after_valid_loss')
 
