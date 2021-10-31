@@ -1,2 +1,3 @@
-petfinder-pawpularity-score/
+data/
 .DS_Store
+*cpython*
