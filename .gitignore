@@ -1,3 +1,4 @@
+*.pkl
 data/
 .DS_Store
 *cpython*

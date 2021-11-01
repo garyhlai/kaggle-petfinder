@@ -3,6 +3,7 @@ import torch
 from torch.cuda import amp
 from fastai.basics import store_attr, noop
 import dill
+from .utils import find_incremental_filename
 
 class Learner:
     def __init__(self, model, dls, loss_func, optimizer, lr, valid_interval=2, cbs=[], get_pred=None, save_learner=True):
@@ -25,7 +26,7 @@ class Learner:
             self('after_epoch')
         self('after_fit')
         if self.save_learner: 
-            self.save("./")
+            self.save(".")
     
     def validate_interval(self):
         self.validate_model() 
@@ -74,7 +75,8 @@ class Learner:
         # export everything except for reference to learner
         export[cb_name] = {key: value for key, value in cb.__dict__.items() if key != 'learner'}
       # save
-      with open(f"{path}/learner.pkl", 'wb') as learner_file:
+      filename = find_incremental_filename(path)
+      with open(filename, 'wb') as learner_file:
         dill.dump(export, learner_file)
         print("save successful!")
 
